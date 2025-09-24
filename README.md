@@ -1,4 +1,9 @@
-# RISE: Standardized ROS2 Docker Environment
+<p align="center">
+  <img src="github-assets/rise-docker-ros2-container-header.png" alt="Project Header" />
+</p>
+
+---
+
 This repository contains the standardized environment for using ROS2 within the RISE project. Whiel the production systems dont run a Docker setup, we use the containerized approach for development purposes. 
 
 ## Building
