@@ -28,18 +28,19 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3-pip python3-setuptools python3-pytest\
       locales ca-certificates curl gnupg2 dirmngr lsb-release \
-      software-properties-common git zsh wget
+      software-properties-common git git-lfs nano vim zsh wget
 
 # Install user-added debian packages from 'apt_requirements' file 
-COPY apt_requirements /tmp
+COPY ./resources/apt_requirements /tmp
 RUN xargs -a /tmp/apt_requirements -r apt-get install -y --no-install-recommends || true
 RUN rm /tmp/apt_requirements
 
 # Setup ZSH and Powerlevel10k
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/.powerlevel10k
 RUN echo 'source /root/.powerlevel10k/powerlevel10k.zsh-theme' >> /root/.zshrc
-COPY .p10k.zsh /root/.p10k.zsh
+COPY ./resources/.p10k.zsh /root/.p10k.zsh
 RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> /root/.zshrc
 RUN chsh -s /bin/zsh
 SHELL ["/bin/zsh", "-c"]
@@ -71,7 +72,7 @@ RUN apt-get upgrade -y
 RUN apt-get install ros-${ROS_DISTRO}-ros-base -y
 
 # Install ROS2 packages from "ros_requirements" file
-COPY ros_requirements /tmp
+COPY ./resources/ros_requirements /tmp
 RUN cat /tmp/ros_requirements | DEBIAN_FRONTEND=noninteractive xargs -I {} apt-get  install --yes --no-install-recommends ros-${ROS_DISTRO}-{}
 RUN rm /tmp/ros_requirements
 
@@ -92,8 +93,8 @@ RUN rosdep init && rosdep update
 
 
 # Install user python packages from `python_requirements` file
-COPY python_requirements /tmp
-RUN pip install -r /tmp/python_requirements
+COPY ./resources/python_requirements /tmp
+RUN pip install --no-cache-dir --break-system-packages -r /tmp/python_requirements
 RUN rm /tmp/python_requirements
 
 # Set default shell to zsh
