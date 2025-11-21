@@ -57,3 +57,9 @@ find . -maxdepth 7 -type d -name "venv" -prune -o -type f \( -name "*.sh" -o -na
 
 
 echo -e "\n\n######################## Done! ########################\n\n"
+
+# Move to project path
+cd $PROJECT_PATH
+
+# Start zsh shell and clear the terminal
+exec zsh -c "clear; exec zsh"
