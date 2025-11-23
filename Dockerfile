@@ -103,6 +103,9 @@ CMD [ "zsh" ]
 # Set working directory
 WORKDIR /workspaces/rise-os-core
 
+# Source ROS project workspace
+RUN echo 'if [ -f /workspaces/rise-os-core/riseos_ws/install/setup.zsh ]; then source /workspaces/rise-os-core/riseos_ws/install/setup.zsh; fi' >> /root/.zshrc
+
 # Start with startup script
 COPY ./resources/startup.sh /tmp/startup.sh
 RUN chmod +x /tmp/startup.sh
