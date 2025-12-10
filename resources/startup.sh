@@ -61,5 +61,5 @@ echo -e "\n\n######################## Done! ########################\n\n"
 # Move to project path
 cd $PROJECT_PATH
 
-# Start zsh shell and clear the terminal
-exec zsh -c "clear; exec zsh"
+# Start bash shell and clear the terminal
+exec bash -c "clear; exec bash"

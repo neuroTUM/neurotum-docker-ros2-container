@@ -30,20 +30,17 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update && apt-get install -y --no-install-recommends \
       python3-pip python3-setuptools python3-pytest\
       locales ca-certificates curl gnupg2 dirmngr lsb-release \
-      software-properties-common git git-lfs nano vim zsh wget
+      software-properties-common git git-lfs nano vim wget
 
 # Install user-added debian packages from 'apt_requirements' file 
 COPY ./resources/apt_requirements /tmp
 RUN xargs -a /tmp/apt_requirements -r apt-get install -y --no-install-recommends || true
 RUN rm /tmp/apt_requirements
 
-# Setup ZSH and Powerlevel10k
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/.powerlevel10k
-RUN echo 'source /root/.powerlevel10k/powerlevel10k.zsh-theme' >> /root/.zshrc
-COPY ./resources/.p10k.zsh /root/.p10k.zsh
-RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> /root/.zshrc
-RUN chsh -s /bin/zsh
-SHELL ["/bin/zsh", "-c"]
+# Setup oh-my-bash and robbyrussell theme
+RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+COPY ./resources/robbyrussell.theme.sh /root/.oh-my-bash/custom/themes/robbyrussell/robbyrussell.theme.sh
+RUN sed -i 's/OSH_THEME=".*"/OSH_THEME="robbyrussell"/' /root/.bashrc
 
 # Setup locales package
 RUN locale-gen en_US en_US.UTF-8 
@@ -77,7 +74,6 @@ RUN cat /tmp/ros_requirements | DEBIAN_FRONTEND=noninteractive xargs -I {} apt-g
 RUN rm /tmp/ros_requirements
 
 # Source ROS setup script
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.zsh" >> /root/.zshrc
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc
 
 # Install recommended ROS2 packages
@@ -97,14 +93,14 @@ COPY ./resources/python_requirements /tmp
 RUN pip install --no-cache-dir --break-system-packages -r /tmp/python_requirements
 RUN rm /tmp/python_requirements
 
-# Set default shell to zsh
-CMD [ "zsh" ]
+# Set default shell to bash
+CMD [ "bash" ]
 
 # Set working directory
 WORKDIR /workspaces/rise-os-core
 
 # Source ROS project workspace
-RUN echo 'if [ -f /workspaces/rise-os-core/riseos_ws/install/setup.zsh ]; then source /workspaces/rise-os-core/riseos_ws/install/setup.zsh; fi' >> /root/.zshrc
+RUN echo 'if [ -f /workspaces/rise-os-core/riseos_ws/install/setup.bash ]; then source /workspaces/rise-os-core/riseos_ws/install/setup.bash; fi' >> /root/.bashrc
 
 # Start with startup script
 COPY ./resources/startup.sh /tmp/startup.sh
