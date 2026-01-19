@@ -1,2 +1,11 @@
 pyyaml
 pre-commit
+flake8
+flake8-docstrings
+flake8-print
+flake8-pytest-style
+flake8-quotes
+flake8-eradicate
+flake8-simplify
+flake8-bugbear
+flake8-pie
