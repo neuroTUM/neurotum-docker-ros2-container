@@ -5,6 +5,9 @@ name: Cleanup Develop Images
 on:
   schedule:
     - cron: '0 0 * * *'
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
 
 env: 
@@ -32,3 +35,4 @@ jobs:
           for id in $ids; do
             gh api --method DELETE "$VERSIONS_URL/$id"
           done
+    
