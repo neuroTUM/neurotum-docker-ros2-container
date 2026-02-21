@@ -1,0 +1,34 @@
+name: Cleanup Develop Images
+
+# Workflow to delete old "develop-*" tagged images from the container registry on a daily basis.
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env: 
+  PACKAGE_NAME: rise-os
+
+jobs:
+  cleanup-develop-images:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Delete develop images
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          VERSIONS_URL="/orgs/$OWNER/packages/container/$PACKAGE_NAME/versions"
+
+          # Fetch all package versions whose tag starts with "develop-"
+          ids=$(gh api --paginate "$VERSIONS_URL" \
+            --jq '.[] | select(.metadata.container.tags[] | startswith("develop-")) | .id')
+
+          # Delete each matching version from the container registry
+          for id in $ids; do
+            gh api --method DELETE "$VERSIONS_URL/$id"
+          done
