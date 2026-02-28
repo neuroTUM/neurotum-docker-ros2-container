@@ -6,3 +6,5 @@ ament-cmake-gtest
 ament-cmake-pytest
 ament-lint-auto
 ament-lint-common
+nlohmann-json3-dev
+libcurl4-openssl-dev
