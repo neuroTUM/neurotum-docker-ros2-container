@@ -28,9 +28,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      python3-pip python3-setuptools python3-pytest\
-      locales ca-certificates curl gnupg2 dirmngr lsb-release \
-      software-properties-common git git-lfs nano vim wget
+    python3-pip python3-setuptools python3-pytest\
+    locales ca-certificates curl gnupg2 dirmngr lsb-release \
+    software-properties-common git git-lfs nano vim wget cmake \
+    libssl-dev libudev-dev pkg-config libusb-1.0-0-dev build-essential \
+    libgtk-3-dev apt-transport-https libglfw3-dev libgl1-mesa-dev \
+    libglu1-mesa-dev wget git at sudo
 
 # Install user-added debian packages from 'apt_requirements' file 
 COPY ./resources/apt_requirements /tmp
@@ -46,6 +49,19 @@ RUN sed -i 's/OSH_THEME=".*"/OSH_THEME="robbyrussell"/' /root/.bashrc
 RUN locale-gen en_US en_US.UTF-8 
 RUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
+# Install IntelRealSense drivers for camera
+RUN git clone https://github.com/IntelRealSense/librealsense.git -b r/2.58.1 /tmp/librealsense
+RUN cd /tmp/librealsense \
+    ./scripts/setup_udev_rules.sh && \
+    mkdir build && \
+    cd build && \
+    cmake ../ \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_WITH_DDS=ON && \
+    make -j$(nproc) && \
+    make install && \
+    ldconfig
 
 # =================== Building ROS 2 ======================= #
 
@@ -84,9 +100,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends  \
 # Init rosdep and update it
 RUN rosdep init && rosdep update
 
+# Installing Realsense ROS Wrapper
+RUN git clone https://github.com/realsenseai/realsense-ros.git -b r/4.58.1 /tmp/realsense-ros
+RUN cd /tmp/realsense-ros && \
+    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    rosdep install -i --from-path . --rosdistro $ROS_DISTRO --skip-keys=librealsense2 -y && \
+    colcon build --install-base /opt/realsense-ros
 
 # ================ Setting Up Workspaces ==================== #
-
 
 # Install user python packages from `python_requirements` file
 COPY ./resources/python_requirements /tmp
@@ -101,6 +122,11 @@ WORKDIR /workspaces/rise-os-core
 
 # Source ROS project workspace
 RUN echo 'if [ -f /workspaces/rise-os-core/riseos_ws/install/setup.bash ]; then source /workspaces/rise-os-core/riseos_ws/install/setup.bash; fi' >> /root/.bashrc
+# Source realsense-ros
+RUN echo 'if [ -f /opt/realsense-ros/setup.bash ]; then source /opt/realsense-ros/setup.bash; fi' >> /root/.bashrc
+
+# Copy realsense config to enable DDS with wrapper execution
+COPY ./resources/.realsense-config.json /root/.realsense-config.json
 
 # Start with startup script
 COPY ./resources/startup.sh /tmp/startup.sh
