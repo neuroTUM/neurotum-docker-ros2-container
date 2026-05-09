@@ -1,4 +1,2 @@
 build-essential
 cmake
-librealsense2-dkms
-librealsense2-utils
