@@ -6,4 +6,8 @@ ament-cmake-gtest
 ament-cmake-pytest
 ament-lint-auto
 ament-lint-common
-rtabmap-ros
+
+# -------------------------
+# Vision Package
+# -------------------------
+rtabmap-ros # for odometry and slam

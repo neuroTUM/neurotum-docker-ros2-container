@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install user-added debian packages from 'apt_requirements' file 
 COPY ./resources/apt_requirements /tmp
+RUN sed -i 's/#.*$//g' /tmp/apt_requirements
 RUN xargs -a /tmp/apt_requirements -r apt-get install -y --no-install-recommends || true
 RUN rm /tmp/apt_requirements
 
@@ -95,6 +96,7 @@ RUN apt-get install ros-${ROS_DISTRO}-ros-base -y
 
 # Install ROS2 packages from "ros_requirements" file
 COPY ./resources/ros_requirements /tmp
+RUN sed -i 's/#.*$//g' /tmp/ros_requirements
 RUN cat /tmp/ros_requirements | DEBIAN_FRONTEND=noninteractive xargs -I {} apt-get  install --yes --no-install-recommends ros-${ROS_DISTRO}-{}
 RUN rm /tmp/ros_requirements
 
@@ -121,6 +123,7 @@ RUN cd /tmp/realsense-ros && \
 
 # Install user python packages from `python_requirements` file
 COPY ./resources/python_requirements /tmp
+RUN sed -i 's/#.*$//g' /tmp/python_requirements
 RUN pip install --no-cache-dir --break-system-packages -r /tmp/python_requirements
 RUN rm /tmp/python_requirements
 
