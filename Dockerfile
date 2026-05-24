@@ -115,7 +115,7 @@ RUN git clone https://github.com/realsenseai/realsense-ros.git -b r/4.58.1 /tmp/
 RUN cd /tmp/realsense-ros && \
     . /opt/ros/${ROS_DISTRO}/setup.sh && \
     rosdep install -i --from-path . --rosdistro $ROS_DISTRO --skip-keys=librealsense2 -y && \
-    colcon build --install-base /opt/realsense-ros
+    colcon build --install-base /opt/realsense-ros --cmake-args -DBUILD_WITH_DDS=ON
 
 # ================ Setting Up Workspaces ==================== #
 
