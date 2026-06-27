@@ -52,4 +52,11 @@ To execute commands in a running container:
 docker exec -it <container_name> /bin/zsh
 ```
 
+For running this with the depth camera OAK D LITE
+```bash
+echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"' | sudo tee /etc/udev/rules.d/80-movidius.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
 Note: The container uses ZSH with Powerlevel10k theme by default.

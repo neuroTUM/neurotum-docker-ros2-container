@@ -94,6 +94,14 @@ RUN python3 -m pip install --no-cache-dir --break-system-packages \
         "opencv-python-headless<4.12" \
         ultralytics-opencv-headless
 
+# =================== OAK-D Lite / DepthAI ROS ====================== #
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros2-testing-apt-source && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-depthai-ros-v3
+
 # ================ Setting Up Workspaces ==================== #
 
 
