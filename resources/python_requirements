@@ -24,3 +24,4 @@ flake8-functions-names
 flake8-length
 flake8-comments
 flake8-fixme
+prettytable
